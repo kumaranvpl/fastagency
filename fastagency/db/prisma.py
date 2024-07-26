@@ -8,7 +8,7 @@ from prisma.actions import AuthTokenActions, ModelActions
 from .base import BaseBackendProtocol, BaseFrontendProtocol
 
 
-class BackendDBProtocol(BaseBackendProtocol):
+class PrismaBackendDB(BaseBackendProtocol):
     ENV_VAR = "PY_DATABASE_URL"
 
     async def find_model_using_raw(
@@ -41,7 +41,7 @@ class BackendDBProtocol(BaseBackendProtocol):
             yield db.authtoken
 
 
-class FrontendDBProtocol(BaseFrontendProtocol):  # type: ignore[misc]
+class PrismaFrontendDB(BaseFrontendProtocol):  # type: ignore[misc]
     ENV_VAR = "DATABASE_URL"
 
     async def get_user(self, user_uuid: Union[int, str]) -> Any:

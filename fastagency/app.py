@@ -12,7 +12,7 @@ from prisma.models import Model
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from .auth_token.auth import DeploymentAuthToken, create_deployment_auth_token
-from .db.prisma import BackendDBProtocol, FrontendDBProtocol
+from .db.prisma import PrismaBackendDB, PrismaFrontendDB
 from .helpers import (
     add_model_to_user,
     create_model,
@@ -78,7 +78,7 @@ async def validate_secret_model(
 ) -> Dict[str, Any]:
     type: str = "secret"
 
-    found_model = await BackendDBProtocol().find_model_using_raw(model_uuid=model_uuid)
+    found_model = await PrismaBackendDB().find_model_using_raw(model_uuid=model_uuid)
     if "api_key" in found_model["json_str"]:
         model["api_key"] = found_model["json_str"]["api_key"]
     try:
@@ -136,7 +136,7 @@ async def add_model(
 
 
 async def create_toolbox_for_new_user(user_uuid: Union[str, UUID]) -> Dict[str, Any]:
-    await FrontendDBProtocol().get_user(user_uuid=user_uuid)  # type: ignore[arg-type]
+    await PrismaFrontendDB().get_user(user_uuid=user_uuid)  # type: ignore[arg-type]
 
     domain = environ.get("DOMAIN", "localhost")
     toolbox_openapi_url = (
@@ -181,8 +181,8 @@ async def update_model(
     registry = Registry.get_default()
     validated_model = registry.validate(type_name, model_name, model)
 
-    found_model = await BackendDBProtocol().find_model_using_raw(model_uuid=model_uuid)
-    async with BackendDBProtocol().get_model_connection() as m:
+    found_model = await PrismaBackendDB().find_model_using_raw(model_uuid=model_uuid)
+    async with PrismaBackendDB().get_model_connection() as m:
         await m.update(
             where={"uuid": found_model["uuid"]},  # type: ignore[arg-type]
             data={  # type: ignore[typeddict-unknown-key]
@@ -200,8 +200,8 @@ async def update_model(
 async def models_delete(
     user_uuid: str, type_name: str, model_uuid: str
 ) -> Dict[str, Any]:
-    found_model = await BackendDBProtocol().find_model_using_raw(model_uuid=model_uuid)
-    async with BackendDBProtocol().get_model_connection() as m:
+    found_model = await PrismaBackendDB().find_model_using_raw(model_uuid=model_uuid)
+    async with PrismaBackendDB().get_model_connection() as m:
         model = await m.delete(
             where={"uuid": found_model["uuid"]}  # type: ignore[arg-type]
         )
@@ -339,7 +339,7 @@ async def chat(request: ChatRequest) -> Dict[str, Any]:
 
 @app.post("/deployment/{deployment_uuid}/chat")
 async def deployment_chat(deployment_uuid: str) -> Dict[str, Any]:
-    found_model = await BackendDBProtocol().find_model_using_raw(
+    found_model = await PrismaBackendDB().find_model_using_raw(
         model_uuid=deployment_uuid
     )
     team_name = found_model["json_str"]["name"]
@@ -382,8 +382,8 @@ class DeploymentAuthTokenInfo(BaseModel):
 async def get_all_deployment_auth_tokens(
     user_uuid: str, deployment_uuid: str
 ) -> List[DeploymentAuthTokenInfo]:
-    user = await FrontendDBProtocol().get_user(user_uuid=user_uuid)
-    deployment = await BackendDBProtocol().find_model_using_raw(
+    user = await PrismaFrontendDB().get_user(user_uuid=user_uuid)
+    deployment = await PrismaBackendDB().find_model_using_raw(
         model_uuid=deployment_uuid
     )
 
@@ -392,7 +392,7 @@ async def get_all_deployment_auth_tokens(
             status_code=403, detail="User does not have access to this deployment"
         )
 
-    async with BackendDBProtocol().get_authtoken_connection() as authtoken:
+    async with PrismaBackendDB().get_authtoken_connection() as authtoken:
         auth_tokens = await authtoken.find_many(
             where={"deployment_uuid": deployment_uuid, "user_uuid": user_uuid},
         )
@@ -410,8 +410,8 @@ async def delete_deployment_auth_token(
     deployment_uuid: str,
     auth_token_uuid: str,
 ) -> DeploymentAuthTokenInfo:
-    user = await FrontendDBProtocol().get_user(user_uuid=user_uuid)
-    deployment = await BackendDBProtocol().find_model_using_raw(
+    user = await PrismaFrontendDB().get_user(user_uuid=user_uuid)
+    deployment = await PrismaBackendDB().find_model_using_raw(
         model_uuid=deployment_uuid
     )
 
@@ -420,7 +420,7 @@ async def delete_deployment_auth_token(
             status_code=403, detail="User does not have access to this deployment"
         )
 
-    async with BackendDBProtocol().get_authtoken_connection() as authtoken:
+    async with PrismaBackendDB().get_authtoken_connection() as authtoken:
         auth_token = await authtoken.delete(
             where={  # type: ignore[typeddict-unknown-key]
                 "uuid": auth_token_uuid,
