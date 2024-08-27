@@ -26,9 +26,9 @@ jobs:
           path: .cache
       - run: pip install -e ".[dev]"
       - name: Run wasp prisma commands
-        run: prisma db push --schema=wasp_schema.prisma && prisma generate --schema=wasp_schema.prisma
+        run: prisma generate --schema=wasp_schema.prisma
       - name: Prisma
-        run: prisma migrate deploy && prisma generate
+        run: prisma generate
       - run: ls -lah docs/docs/en/api/fastagency/studio
       - run: ./scripts/build-docs.sh
       - run: ls -lah docs/docs/en/api/fastagency/studio
