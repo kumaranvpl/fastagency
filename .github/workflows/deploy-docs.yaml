@@ -25,7 +25,9 @@ jobs:
           key: ${{ github.ref }}
           path: .cache
       - run: pip install -e ".[dev]"
+      - run: ls -lah docs/docs/en/api/fastagency/studio
       - run: ./scripts/build-docs.sh
+      - run: ls -lah docs/docs/en/api/fastagency/studio
       - run: ls -lah docs/site/api/fastagency/studio
       - run: echo "Dummy change to trigger CI"
       - run: echo "VERSION=$(python3 -c 'from importlib.metadata import version; v=version("fastagency"); print(".".join(v.split(".")[:2]) if "dev" not in v else v[:9])')" >> $GITHUB_ENV
