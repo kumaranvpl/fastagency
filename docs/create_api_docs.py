@@ -242,7 +242,11 @@ def _generate_api_docs_for_module(root_path: Path, module_name: str) -> str:
 
     """
     members = _import_all_members(module_name)
+    print("members are")
+    print(members)
     members_with_submodules = _add_all_submodules(members)
+    print("members with submodules are")
+    print(members_with_submodules)
     api_summary = _get_api_summary(members_with_submodules)
 
     api_root = root_path / "docs" / "en" / "api"
