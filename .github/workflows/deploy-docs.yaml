@@ -26,6 +26,7 @@ jobs:
           path: .cache
       - run: pip install -e ".[dev]"
       - run: ./scripts/build-docs.sh
+      - run: ls -lah docs/site/api/fastagency/studio
       - run: echo "VERSION=$(python3 -c 'from importlib.metadata import version; v=version("fastagency"); print(".".join(v.split(".")[:2]) if "dev" not in v else v[:9])')" >> $GITHUB_ENV
       - run: echo "IS_RC=$(python3 -c 'from importlib.metadata import version; print("rc" in version("fastagency"))')" >> $GITHUB_ENV
       - name: Configure Git user
@@ -34,10 +35,13 @@ jobs:
           git config --local user.name "github-actions[bot]"
       - run: echo $VERSION
       - run: echo $IS_RC
+      - run: ls -lah docs/site/api/fastagency/studio
       - run: |
           if [ "$IS_RC" == "False" ]; then
+            ls -lah docs/site/api/fastagency/studio
             cd docs && mike deploy -F mkdocs.yml --update-aliases $VERSION latest
             mike set-default --push --allow-empty -F mkdocs.yml latest
+            ls -lah site/api/fastagency/studio
           else
             cd docs && mike deploy --push -F mkdocs.yml --update-aliases $VERSION
           fi
