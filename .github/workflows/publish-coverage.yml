@@ -1,9 +1,7 @@
 name: Smokeshow
 
 on:
-  workflow_run:
-    workflows: [Pipeline]
-    types: [completed]
+  push:
     branches:
       - main
 
@@ -14,7 +12,7 @@ permissions:
 
 jobs:
   smokeshow:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
