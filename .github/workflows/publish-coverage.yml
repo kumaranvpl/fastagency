@@ -4,8 +4,8 @@ on:
   workflow_run:
     workflows: [Pipeline]
     types: [completed]
-    ignore-branches:
-      - dev
+    branches:
+      - main
 
 
 permissions:
