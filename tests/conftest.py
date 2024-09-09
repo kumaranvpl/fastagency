@@ -5,15 +5,12 @@ import socket
 import threading
 import time
 import uuid
+from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 from platform import system
 from typing import (
     Annotated,
     Any,
-    AsyncGenerator,
-    AsyncIterator,
     Callable,
-    Dict,
-    Iterator,
     Optional,
     TypeVar,
 )
@@ -40,7 +37,7 @@ from fastagency.studio.models.llms.together import TogetherAI, TogetherAIAPIKey
 from fastagency.studio.models.teams.two_agent_teams import TwoAgentTeam
 from fastagency.studio.models.toolboxes.toolbox import OpenAPIAuth, Toolbox
 
-from .helpers import add_random_sufix, expand_fixture, get_by_tag, tag, tag_list
+from .helpers import add_random_suffix, expand_fixture, get_by_tag, tag, tag_list
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -81,7 +78,7 @@ async def user_uuid() -> AsyncIterator[str]:
 ################################################################################
 
 
-def azure_model_llm_config(model_env_name: str) -> Dict[str, Any]:
+def azure_model_llm_config(model_env_name: str) -> dict[str, Any]:
     api_key = os.getenv("AZURE_OPENAI_API_KEY", default="*" * 64)
     api_base = os.getenv(
         "AZURE_API_ENDPOINT", default="https://my-deployment.openai.azure.com"
@@ -123,23 +120,23 @@ def azure_model_llm_config(model_env_name: str) -> Dict[str, Any]:
 
 @tag("llm_config")
 @pytest.fixture
-def azure_gpt35_turbo_16k_llm_config() -> Dict[str, Any]:
+def azure_gpt35_turbo_16k_llm_config() -> dict[str, Any]:
     return azure_model_llm_config("AZURE_GPT35_MODEL")
 
 
 @tag("llm_config")
 @pytest.fixture
-def azure_gpt4_llm_config() -> Dict[str, Any]:
+def azure_gpt4_llm_config() -> dict[str, Any]:
     return azure_model_llm_config("AZURE_GPT4_MODEL")
 
 
 @tag("llm_config")
 @pytest.fixture
-def azure_gpt4o_llm_config() -> Dict[str, Any]:
+def azure_gpt4o_llm_config() -> dict[str, Any]:
     return azure_model_llm_config("AZURE_GPT4o_MODEL")
 
 
-def openai_llm_config(model: str) -> Dict[str, Any]:
+def openai_llm_config(model: str) -> dict[str, Any]:
     zeros = "0" * 20
     api_key = os.getenv("OPENAI_API_KEY", default=f"sk-{zeros}T3BlbkFJ{zeros}")
 
@@ -160,8 +157,20 @@ def openai_llm_config(model: str) -> Dict[str, Any]:
 
 @tag("llm_config")
 @pytest.fixture
-def openai_gpt35_turbo_16k_llm_config() -> Dict[str, Any]:
+def openai_gpt35_turbo_16k_llm_config() -> dict[str, Any]:
     return openai_llm_config("gpt-3.5-turbo")
+
+
+@tag("llm_config")
+@pytest.fixture
+def openai_gpt4o_llm_config() -> dict[str, Any]:
+    return openai_llm_config("gpt-4o")
+
+
+@tag("llm_config")
+@pytest.fixture
+def openai_gpt4o_mini_llm_config() -> dict[str, Any]:
+    return openai_llm_config("gpt-4o-mini")
 
 
 # @tag("llm_config")
@@ -173,14 +182,14 @@ def openai_gpt35_turbo_16k_llm_config() -> Dict[str, Any]:
 @tag("llm-key")
 @pytest_asyncio.fixture()
 async def azure_oai_key_ref(
-    user_uuid: str, azure_gpt35_turbo_16k_llm_config: Dict[str, Any]
+    user_uuid: str, azure_gpt35_turbo_16k_llm_config: dict[str, Any]
 ) -> ObjectReference:
     api_key = azure_gpt35_turbo_16k_llm_config["config_list"][0]["api_key"]
     return await create_model_ref(
         AzureOAIAPIKey,
         "secret",
         user_uuid=user_uuid,
-        name=add_random_sufix("azure_oai_key"),
+        name=add_random_suffix("azure_oai_key"),
         api_key=api_key,
     )
 
@@ -189,7 +198,7 @@ async def azure_oai_key_ref(
 @pytest_asyncio.fixture()
 async def azure_oai_gpt35_ref(
     user_uuid: str,
-    azure_gpt35_turbo_16k_llm_config: Dict[str, Any],
+    azure_gpt35_turbo_16k_llm_config: dict[str, Any],
     azure_oai_key_ref: ObjectReference,
 ) -> ObjectReference:
     kwargs = azure_gpt35_turbo_16k_llm_config["config_list"][0].copy()
@@ -199,7 +208,7 @@ async def azure_oai_gpt35_ref(
         AzureOAI,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("azure_oai"),
+        name=add_random_suffix("azure_oai"),
         api_key=azure_oai_key_ref,
         temperature=temperature,
         **kwargs,
@@ -210,7 +219,7 @@ async def azure_oai_gpt35_ref(
 @pytest_asyncio.fixture()
 async def azure_oai_gpt4_ref(
     user_uuid: str,
-    azure_gpt4_llm_config: Dict[str, Any],
+    azure_gpt4_llm_config: dict[str, Any],
     azure_oai_key_ref: ObjectReference,
 ) -> ObjectReference:
     kwargs = azure_gpt4_llm_config["config_list"][0].copy()
@@ -220,7 +229,7 @@ async def azure_oai_gpt4_ref(
         AzureOAI,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("azure_oai"),
+        name=add_random_suffix("azure_oai"),
         api_key=azure_oai_key_ref,
         temperature=temperature,
         **kwargs,
@@ -231,7 +240,7 @@ async def azure_oai_gpt4_ref(
 @pytest_asyncio.fixture()
 async def azure_oai_gpt4o_ref(
     user_uuid: str,
-    azure_gpt4o_llm_config: Dict[str, Any],
+    azure_gpt4o_llm_config: dict[str, Any],
     azure_oai_key_ref: ObjectReference,
 ) -> ObjectReference:
     kwargs = azure_gpt4o_llm_config["config_list"][0].copy()
@@ -241,7 +250,7 @@ async def azure_oai_gpt4o_ref(
         AzureOAI,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("azure_oai"),
+        name=add_random_suffix("azure_oai"),
         api_key=azure_oai_key_ref,
         temperature=temperature,
         **kwargs,
@@ -249,7 +258,7 @@ async def azure_oai_gpt4o_ref(
 
 
 async def openai_oai_key_ref(
-    user_uuid: str, openai_llm_config: Dict[str, Any]
+    user_uuid: str, openai_llm_config: dict[str, Any]
 ) -> ObjectReference:
     api_key = openai_llm_config["config_list"][0]["api_key"]
     model = openai_llm_config["config_list"][0]["model"]
@@ -257,7 +266,7 @@ async def openai_oai_key_ref(
         OpenAIAPIKey,
         "secret",
         user_uuid=user_uuid,
-        name=add_random_sufix("openai_oai_key"),
+        name=add_random_suffix("openai_oai_key"),
         api_key=api_key,
         model=model,
     )
@@ -266,7 +275,7 @@ async def openai_oai_key_ref(
 @tag("llm-key")
 @pytest_asyncio.fixture()
 async def openai_oai_key_gpt35_ref(
-    user_uuid: str, openai_gpt35_turbo_16k_llm_config: Dict[str, Any]
+    user_uuid: str, openai_gpt35_turbo_16k_llm_config: dict[str, Any]
 ) -> ObjectReference:
     return await openai_oai_key_ref(user_uuid, openai_gpt35_turbo_16k_llm_config)
 
@@ -281,7 +290,7 @@ async def openai_oai_key_gpt35_ref(
 
 async def openai_oai_ref(
     user_uuid: str,
-    openai_llm_config: Dict[str, Any],
+    openai_llm_config: dict[str, Any],
     openai_oai_key_ref: ObjectReference,
 ) -> ObjectReference:
     kwargs = openai_llm_config["config_list"][0].copy()
@@ -291,7 +300,7 @@ async def openai_oai_ref(
         OpenAI,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("azure_oai"),
+        name=add_random_suffix("azure_oai"),
         api_key=openai_oai_key_ref,
         temperature=temperature,
         **kwargs,
@@ -302,7 +311,7 @@ async def openai_oai_ref(
 @pytest_asyncio.fixture()
 async def openai_oai_gpt35_ref(
     user_uuid: str,
-    openai_gpt35_turbo_16k_llm_config: Dict[str, Any],
+    openai_gpt35_turbo_16k_llm_config: dict[str, Any],
     openai_oai_key_gpt35_ref: ObjectReference,
 ) -> ObjectReference:
     return await openai_oai_ref(
@@ -334,7 +343,7 @@ async def anthropic_key_ref(user_uuid: str) -> ObjectReference:
         AnthropicAPIKey,
         "secret",
         user_uuid=user_uuid,
-        name=add_random_sufix("anthropic_api_key"),
+        name=add_random_suffix("anthropic_api_key"),
         api_key=api_key,
     )
 
@@ -349,7 +358,7 @@ async def anthropic_ref(
         Anthropic,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("anthropic_api"),
+        name=add_random_suffix("anthropic_api"),
         api_key=anthropic_key_ref,
     )
 
@@ -366,7 +375,7 @@ async def together_ai_key_ref(user_uuid: str) -> ObjectReference:
         TogetherAIAPIKey,
         "secret",
         user_uuid=user_uuid,
-        name=add_random_sufix("togetherai_api_key"),
+        name=add_random_suffix("togetherai_api_key"),
         api_key=api_key,
     )
 
@@ -381,7 +390,7 @@ async def togetherai_ref(
         TogetherAI,
         "llm",
         user_uuid=user_uuid,
-        name=add_random_sufix("togetherai"),
+        name=add_random_suffix("togetherai"),
         api_key=together_ai_key_ref,
         model="Mixtral-8x7B Instruct v0.1",
     )
@@ -409,11 +418,11 @@ def create_fastapi_app(host: str, port: int) -> FastAPI:
     )
 
     @app.get("/")
-    def read_root() -> Dict[str, str]:
+    def read_root() -> dict[str, str]:
         return {"Hello": "World"}
 
     @app.get("/items/{item_id}")
-    def read_item(item_id: int, q: Optional[str] = None) -> Dict[str, Any]:
+    def read_item(item_id: int, q: Optional[str] = None) -> dict[str, Any]:
         return {"item_id": item_id, "q": q}
 
     @app.post("/items")
@@ -567,7 +576,7 @@ async def placeholder_assistant_noapi_ref(
         AssistantAgent,
         "agent",
         user_uuid=user_uuid,
-        name=add_random_sufix("assistant"),
+        name=add_random_suffix("assistant"),
         llm=llm_ref,
     )
 
@@ -580,7 +589,7 @@ async def placeholder_assistant_noapi_ref(
 #         AssistantAgent,
 #         "agent",
 #         user_uuid=user_uuid,
-#         name=add_random_sufix("assistant"),
+#         name=add_random_suffix("assistant"),
 #         llm=openai_oai_gpt4_ref,
 #     )
 
@@ -598,7 +607,7 @@ async def placeholder_assistant_weatherapi_ref(
         AssistantAgent,
         "agent",
         user_uuid=user_uuid,
-        name=add_random_sufix("assistant_weather"),
+        name=add_random_suffix("assistant_weather"),
         llm=llm_ref,
         toolbox_1=weather_toolbox_ref,
         system_message="You are a helpful assistant with access to Weather API. After you successfully answer the question asked and there are no new questions, terminate the chat by outputting 'TERMINATE'",
@@ -615,7 +624,7 @@ async def bing_api_key_ref(user_uuid: str) -> ObjectReference:
         BingAPIKey,
         "secret",
         user_uuid=user_uuid,
-        name=add_random_sufix("bing_api_key"),
+        name=add_random_suffix("bing_api_key"),
         api_key=api_key,
     )
 
@@ -633,7 +642,7 @@ async def placeholder_websurfer_ref(
         WebSurferAgent,
         "agent",
         user_uuid=user_uuid,
-        name=add_random_sufix("websurfer"),
+        name=add_random_suffix("websurfer"),
         llm=llm_ref,
         summarizer_llm=llm_ref,
         bing_api_key=bing_api_key_ref,
@@ -678,7 +687,7 @@ async def user_proxy_agent_ref(user_uuid: str) -> ObjectReference:
         UserProxyAgent,
         "agent",
         user_uuid=user_uuid,
-        name=add_random_sufix("user_proxy_agent"),
+        name=add_random_suffix("user_proxy_agent"),
         max_consecutive_auto_reply=10,
         human_input_mode="NEVER",
     )
@@ -706,7 +715,7 @@ async def placeholder_team_noapi_ref(
         TwoAgentTeam,
         "team",
         user_uuid=user_uuid,
-        name=add_random_sufix("two_agent_team_noapi"),
+        name=add_random_suffix("two_agent_team_noapi"),
         initial_agent=user_proxy_agent_ref,
         secondary_agent=assistant_ref,
         human_input_mode="NEVER",
@@ -728,7 +737,7 @@ async def placeholder_team_weatherapi_ref(
         TwoAgentTeam,
         "team",
         user_uuid=user_uuid,
-        name=add_random_sufix("two_agent_team_weather"),
+        name=add_random_suffix("two_agent_team_weather"),
         initial_agent=user_proxy_agent_ref,
         secondary_agent=assistant_ref,
         human_input_mode="NEVER",

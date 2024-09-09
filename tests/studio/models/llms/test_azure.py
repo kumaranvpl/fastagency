@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -128,7 +128,7 @@ class TestAzureOAI:
                     "type": "string",
                 },
                 "api_key": {
-                    "allOf": [{"$ref": "#/$defs/AzureOAIAPIKeyRef"}],
+                    "$ref": "#/$defs/AzureOAIAPIKeyRef",
                     "description": "The API Key from Azure OpenAI",
                     "title": "API Key",
                 },
@@ -178,6 +178,7 @@ class TestAzureOAI:
             "title": "AzureOAI",
             "type": "object",
         }
+        # print(schema)
         assert schema == expected
 
     @pytest.mark.asyncio
@@ -186,7 +187,7 @@ class TestAzureOAI:
         self,
         user_uuid: str,
         azure_oai_gpt35_ref: ObjectReference,
-        azure_gpt35_turbo_16k_llm_config: Dict[str, Any],
+        azure_gpt35_turbo_16k_llm_config: dict[str, Any],
     ) -> None:
         actual_llm_config = await create_autogen(
             model_ref=azure_oai_gpt35_ref,

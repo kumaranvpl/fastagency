@@ -1,5 +1,5 @@
 import os
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Optional
 
 from asyncer import asyncify
 from autogen.agentchat import AssistantAgent as AutoGenAssistantAgent
@@ -27,7 +27,7 @@ class WebSurferAnswer(BaseModel):
         Field(..., description="The long answer to the task with explanation"),
     ]
     visited_links: Annotated[
-        List[HttpUrl],
+        list[HttpUrl],
         Field(..., description="The list of visited links to generate the answer"),
     ]
 
@@ -49,14 +49,14 @@ class WebSurferChat:
     def __init__(
         self,
         name_prefix: str,
-        llm_config: Dict[str, Any],
-        summarizer_llm_config: Dict[str, Any],
+        llm_config: dict[str, Any],
+        summarizer_llm_config: dict[str, Any],
         viewport_size: int,
         bing_api_key: Optional[str],
         max_consecutive_auto_reply: int = 30,
         max_links_to_click: int = 10,
-        websurfer_kwargs: Dict[str, Any] = {},  # noqa: B006
-        assistant_kwargs: Dict[str, Any] = {},  # noqa: B006
+        websurfer_kwargs: dict[str, Any] = {},  # noqa: B006
+        assistant_kwargs: dict[str, Any] = {},  # noqa: B006
     ):
         """Create a new WebSurferChat instance.
 
@@ -123,7 +123,7 @@ class WebSurferChat:
             **self.assistant_kwargs,
         )
 
-    def is_termination_msg(self, msg: Dict[str, Any]) -> bool:
+    def is_termination_msg(self, msg: dict[str, Any]) -> bool:
         # print(f"is_termination_msg({msg=})")
         if (
             "content" in msg
@@ -176,7 +176,7 @@ class WebSurferChat:
         answer = WebSurferAnswer(
             task=task,
             is_successful=False,
-            short_answer="unexpected error occured",
+            short_answer="unexpected error occurred",
             long_answer=str(e),
             visited_links=[],
         )
@@ -245,7 +245,7 @@ e.g. "I have already answered to that message, please proceed with the task or y
 
     @property
     def error_message(self) -> str:
-        return f"""Please output the JSON-encoded answer only in the following messsage before trying to terminate the chat.
+        return f"""Please output the JSON-encoded answer only in the following message before trying to terminate the chat.
 
 IMPORTANT:
   - NEVER enclose JSON-encoded answer in any other text or formatting including '```json' ... '```' or similar!

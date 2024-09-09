@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from autogen.agentchat import AssistantAgent
@@ -6,7 +6,7 @@ from autogen.agentchat import AssistantAgent
 from fastagency.studio.helpers import create_autogen
 from fastagency.studio.models.base import ObjectReference
 
-from ....helpers import add_random_sufix, get_by_tag, parametrize_fixtures
+from ....helpers import add_random_suffix, get_by_tag, parametrize_fixtures
 
 
 @parametrize_fixtures("llm_ref", get_by_tag("llm"))
@@ -20,9 +20,9 @@ async def test_end2end_simple_chat_with_two_agents(
 ) -> None:
     llm_config = await create_autogen(model_ref=llm_ref, user_uuid=user_uuid)
 
-    flags: Dict[str, bool] = {}
+    flags: dict[str, bool] = {}
 
-    def is_termination_msg(msg: Dict[str, Any]) -> bool:
+    def is_termination_msg(msg: dict[str, Any]) -> bool:
         flags["terminated"] = "TERMINATE" in msg["content"]
         return flags["terminated"]
 
@@ -33,7 +33,7 @@ async def test_end2end_simple_chat_with_two_agents(
         flags["terminated"] = False
 
         assistant_agent = AssistantAgent(
-            name=add_random_sufix("assistant"),
+            name=add_random_suffix("assistant"),
             llm_config=llm_config,
             system_message="You are a helpful assistant.",
             code_execution_config=False,
@@ -43,10 +43,10 @@ async def test_end2end_simple_chat_with_two_agents(
         )
 
         verifier_agent = AssistantAgent(
-            name=add_random_sufix("verifier"),
+            name=add_random_suffix("verifier"),
             llm_config=llm_config,
             system_message="""You are a verifier responsible for checking if other agents are giving correct answers. Please write a
-    few sentencases with your thoughs about the answer before classifying it as correct or not.
+    few sentencases with your thoughts about the answer before classifying it as correct or not.
     If the answer is correct, please finalize your analysis with word 'TERMINATE' to end the conversation.
     Otherwise, give a detailed feedback and help the agent in providing a correct answer.
     """,

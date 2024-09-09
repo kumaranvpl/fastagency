@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          lfs: true
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
@@ -29,7 +30,6 @@ jobs:
         run: prisma generate --schema=wasp_schema.prisma
       - name: Prisma
         run: prisma generate
-      - run: ls -lah docs/docs/en/api/fastagency/studio
       - run: ./scripts/build-docs.sh
       - run: ls -lah docs/docs/en/api/fastagency/studio
       - run: ls -lah docs/site/api/fastagency/studio

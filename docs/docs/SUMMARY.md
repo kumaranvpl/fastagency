@@ -2,9 +2,104 @@
 search:
   exclude: true
 ---
-- [Features](fastagency.md)
+- Getting Started
+    - [Getting Started](getting-started/index.md)
+- Tutorial
+    - [Getting Started](tutorial/index.md)
+    - [Using External REST APIs](tutorial/external-rest-apis/index.md)
+    - [Custom User Interactions](tutorial/custom-user-interactions/index.md)
 - Reference
     - fastagency
+        - [FastAgency](api/fastagency/FastAgency.md)
+        - cli
+            - cli
+                - [callback](api/fastagency/cli/cli/callback.md)
+                - [dev](api/fastagency/cli/cli/dev.md)
+                - [main](api/fastagency/cli/cli/main.md)
+                - [run](api/fastagency/cli/cli/run.md)
+                - [version](api/fastagency/cli/cli/version.md)
+                - [version_callback](api/fastagency/cli/cli/version_callback.md)
+            - discover
+                - [ModuleData](api/fastagency/cli/discover/ModuleData.md)
+                - [get_app_name](api/fastagency/cli/discover/get_app_name.md)
+                - [get_default_path](api/fastagency/cli/discover/get_default_path.md)
+                - [get_import_string](api/fastagency/cli/discover/get_import_string.md)
+                - [get_module_data_from_path](api/fastagency/cli/discover/get_module_data_from_path.md)
+                - [import_from_string](api/fastagency/cli/discover/import_from_string.md)
+            - exceptions
+                - [FastAgencyCLIError](api/fastagency/cli/exceptions/FastAgencyCLIError.md)
+            - logging
+                - [setup_logging](api/fastagency/cli/logging/setup_logging.md)
+        - core
+            - [Chatable](api/fastagency/core/Chatable.md)
+            - [FastAgency](api/fastagency/core/FastAgency.md)
+            - [FunctionCallExecution](api/fastagency/core/FunctionCallExecution.md)
+            - [IOMessage](api/fastagency/core/IOMessage.md)
+            - [MultipleChoice](api/fastagency/core/MultipleChoice.md)
+            - [SuggestedFunctionCall](api/fastagency/core/SuggestedFunctionCall.md)
+            - [TextInput](api/fastagency/core/TextInput.md)
+            - [TextMessage](api/fastagency/core/TextMessage.md)
+            - [Workflows](api/fastagency/core/Workflows.md)
+            - app
+                - [FastAgency](api/fastagency/core/app/FastAgency.md)
+            - base
+                - [AskingMessage](api/fastagency/core/base/AskingMessage.md)
+                - [Chatable](api/fastagency/core/base/Chatable.md)
+                - [FunctionCallExecution](api/fastagency/core/base/FunctionCallExecution.md)
+                - [IOMessage](api/fastagency/core/base/IOMessage.md)
+                - [IOMessageVisitor](api/fastagency/core/base/IOMessageVisitor.md)
+                - [MultipleChoice](api/fastagency/core/base/MultipleChoice.md)
+                - [Runnable](api/fastagency/core/base/Runnable.md)
+                - [SuggestedFunctionCall](api/fastagency/core/base/SuggestedFunctionCall.md)
+                - [SystemMessage](api/fastagency/core/base/SystemMessage.md)
+                - [TextInput](api/fastagency/core/base/TextInput.md)
+                - [TextMessage](api/fastagency/core/base/TextMessage.md)
+                - [WorkflowCompleted](api/fastagency/core/base/WorkflowCompleted.md)
+                - [Workflows](api/fastagency/core/base/Workflows.md)
+                - [run_workflow](api/fastagency/core/base/run_workflow.md)
+            - io
+                - console
+                    - [ConsoleIO](api/fastagency/core/io/console/ConsoleIO.md)
+                    - base
+                        - [ConsoleIO](api/fastagency/core/io/console/base/ConsoleIO.md)
+                - mesop
+                    - [MesopIO](api/fastagency/core/io/mesop/MesopIO.md)
+                    - base
+                        - [MesopIO](api/fastagency/core/io/mesop/base/MesopIO.md)
+                        - [MesopMessage](api/fastagency/core/io/mesop/base/MesopMessage.md)
+                        - [run_workflow](api/fastagency/core/io/mesop/base/run_workflow.md)
+                    - components
+                        - inputs
+                            - [input_prompt](api/fastagency/core/io/mesop/components/inputs/input_prompt.md)
+                            - [input_user_feedback](api/fastagency/core/io/mesop/components/inputs/input_user_feedback.md)
+                        - ui_common
+                            - [conversation_completed](api/fastagency/core/io/mesop/components/ui_common/conversation_completed.md)
+                            - [header](api/fastagency/core/io/mesop/components/ui_common/header.md)
+                    - data_model
+                        - [Conversation](api/fastagency/core/io/mesop/data_model/Conversation.md)
+                        - [State](api/fastagency/core/io/mesop/data_model/State.md)
+                    - main
+                        - [conversation_page](api/fastagency/core/io/mesop/main/conversation_page.md)
+                        - [get_workflows](api/fastagency/core/io/mesop/main/get_workflows.md)
+                        - [home_page](api/fastagency/core/io/mesop/main/home_page.md)
+                        - [on_user_feedback](api/fastagency/core/io/mesop/main/on_user_feedback.md)
+                        - [reset_conversation](api/fastagency/core/io/mesop/main/reset_conversation.md)
+                        - [send_prompt](api/fastagency/core/io/mesop/main/send_prompt.md)
+                    - message
+                        - [MesopGUIMessageVisitor](api/fastagency/core/io/mesop/message/MesopGUIMessageVisitor.md)
+                        - [darken_hex_color](api/fastagency/core/io/mesop/message/darken_hex_color.md)
+                        - [message_box](api/fastagency/core/io/mesop/message/message_box.md)
+                    - send_prompt
+                        - [send_prompt_to_autogen](api/fastagency/core/io/mesop/send_prompt/send_prompt_to_autogen.md)
+                        - [send_user_feedback_to_autogen](api/fastagency/core/io/mesop/send_prompt/send_user_feedback_to_autogen.md)
+            - runtimes
+                - autogen
+                    - [AutoGenWorkflows](api/fastagency/core/runtimes/autogen/AutoGenWorkflows.md)
+                    - [IOStreamAdapter](api/fastagency/core/runtimes/autogen/IOStreamAdapter.md)
+                    - base
+                        - [AutoGenWorkflows](api/fastagency/core/runtimes/autogen/base/AutoGenWorkflows.md)
+                        - [CurrentMessage](api/fastagency/core/runtimes/autogen/base/CurrentMessage.md)
+                        - [IOStreamAdapter](api/fastagency/core/runtimes/autogen/base/IOStreamAdapter.md)
         - openapi
             - client
                 - [Client](api/fastagency/openapi/client/Client.md)
@@ -12,6 +107,15 @@ search:
             - fastapi_code_generator_helpers
                 - [ArgumentWithDescription](api/fastagency/openapi/fastapi_code_generator_helpers/ArgumentWithDescription.md)
                 - [patch_get_parameter_type](api/fastagency/openapi/fastapi_code_generator_helpers/patch_get_parameter_type.md)
+            - security
+                - [APIKeyCookie](api/fastagency/openapi/security/APIKeyCookie.md)
+                - [APIKeyHeader](api/fastagency/openapi/security/APIKeyHeader.md)
+                - [APIKeyQuery](api/fastagency/openapi/security/APIKeyQuery.md)
+                - [BaseSecurity](api/fastagency/openapi/security/BaseSecurity.md)
+                - [BaseSecurityParameters](api/fastagency/openapi/security/BaseSecurityParameters.md)
+                - [HTTPBearer](api/fastagency/openapi/security/HTTPBearer.md)
+            - security_schema_visitor
+                - [custom_visitor](api/fastagency/openapi/security_schema_visitor/custom_visitor.md)
         - studio
             - app
                 - [ChatRequest](api/fastagency/studio/app/ChatRequest.md)
@@ -147,6 +251,7 @@ search:
                     - toolbox
                         - [Client](api/fastagency/studio/models/toolboxes/toolbox/Client.md)
                         - [OpenAPIAuth](api/fastagency/studio/models/toolboxes/toolbox/OpenAPIAuth.md)
+                        - [OpenAPIAuthToken](api/fastagency/studio/models/toolboxes/toolbox/OpenAPIAuthToken.md)
                         - [Toolbox](api/fastagency/studio/models/toolboxes/toolbox/Toolbox.md)
             - saas_app_generator
                 - [InvalidFlyTokenError](api/fastagency/studio/saas_app_generator/InvalidFlyTokenError.md)

@@ -5,7 +5,7 @@ import subprocess
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from shutil import rmtree
-from typing import Optional
+from typing import Annotated, Optional
 
 import mkdocs.commands.build
 import mkdocs.commands.serve
@@ -13,7 +13,6 @@ import typer
 from create_api_docs import create_api_docs
 from expand_markdown import expand_markdown
 from mkdocs.config import load_config
-from typing_extensions import Annotated
 from update_releases import _find_metablock, update_release_notes
 
 IGNORE_DIRS = ("assets", "stylesheets")
@@ -77,12 +76,12 @@ def preview():
     """A quick server to preview a built site with translations.
 
     For development, prefer the command live (or just mkdocs serve).
-    This is here only to preview a builded site.
+    This is here only to preview a built site.
     """
     _build()
     typer.echo("Warning: this is a very simple server.")
     typer.echo("For development, use the command live instead.")
-    typer.echo("This is here only to preview a builded site.")
+    typer.echo("This is here only to preview a built site.")
     os.chdir(BUILD_DIR)
     addr, port = DEV_SERVER.split(":")
     server = HTTPServer((addr, int(port)), SimpleHTTPRequestHandler)

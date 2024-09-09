@@ -1,6 +1,6 @@
 import json
 import uuid
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from fastapi import BackgroundTasks, HTTPException
@@ -16,7 +16,7 @@ client = TestClient(app)
 
 class TestValidateOpenAIKey:
     @pytest.fixture
-    def model_dict(self) -> Dict[str, Any]:
+    def model_dict(self) -> dict[str, Any]:
         model = OpenAIAPIKey(
             api_key="sk-sUeBP9asw6GiYHXqtg70T3BlbkFJJuLwJFco90bOpU0Ntest",  # pragma: allowlist secret
             name="Hello World!",
@@ -24,14 +24,14 @@ class TestValidateOpenAIKey:
 
         return json.loads(model.model_dump_json())  # type: ignore[no-any-return]
 
-    def test_validate_success(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_success(self, model_dict: dict[str, Any]) -> None:
         response = client.post(
             "/models/secret/OpenAIAPIKey/validate",
             json=model_dict,
         )
         assert response.status_code == 200
 
-    def test_validate_incorrect_api_key(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_incorrect_api_key(self, model_dict: dict[str, Any]) -> None:
         model_dict["api_key"] = "whatever"  # pragma: allowlist secret
 
         response = client.post(
@@ -54,7 +54,7 @@ class TestValidateOpenAIKey:
     @pytest.mark.asyncio
     async def test_validate_secret_model(
         self,
-        model_dict: Dict[str, Any],
+        model_dict: dict[str, Any],
         user_uuid: str,
     ) -> None:
         api_key = OpenAIAPIKey(**model_dict)
@@ -68,20 +68,35 @@ class TestValidateOpenAIKey:
             background_tasks=BackgroundTasks(),
         )
 
-        # Remove api_key and send name alone to validate route
-        model_dict.pop("api_key")
+        # Pass only name in the request, this should only update the name and retain the existing api_key
+        model_dict_with_updated_name = {"name": "Hello World! Updated"}
 
         response = client.post(
             f"/user/{user_uuid}/models/secret/OpenAIAPIKey/{api_key_model_uuid}/validate",
-            json=model_dict,
+            json=model_dict_with_updated_name,
         )
         assert response.status_code == 200
+
+        expected = {"name": "Hello World! Updated", "api_key": model_dict["api_key"]}
+        assert response.json() == expected
+
+        # Pass both name and api_key in the request, this should update both name and api_key
+        model_dict_with_updated_name_and_api_key = {
+            "name": "Hello World! Updated Again",
+            "api_key": "sk-proj-SomeLengthStringWhichCanHave-and_inItAndTheLengthCanBeChangedAtAnyTime",  # pragma: allowlist secret
+        }
+        response = client.post(
+            f"/user/{user_uuid}/models/secret/OpenAIAPIKey/{api_key_model_uuid}/validate",
+            json=model_dict_with_updated_name_and_api_key,
+        )
+        assert response.status_code == 200
+        assert response.json() == model_dict_with_updated_name_and_api_key
 
 
 # we will do this for OpenAI only, the rest should be the same
 class TestValidateOpenAI:
     @pytest.fixture
-    def model_dict(self) -> Dict[str, Any]:
+    def model_dict(self) -> dict[str, Any]:
         key_uuid = uuid.uuid4()
         OpenAIAPIKeyRef = OpenAIAPIKey.get_reference_model()  # noqa: N806
         api_key = OpenAIAPIKeyRef(uuid=key_uuid)
@@ -105,14 +120,14 @@ class TestValidateOpenAI:
 
         assert len(openai_schema.json_schema) > 0
 
-    def test_validate_success(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_success(self, model_dict: dict[str, Any]) -> None:
         response = client.post(
             "/models/llm/OpenAI/validate",
             json=model_dict,
         )
         assert response.status_code == 200
 
-    def test_validate_missing_key(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_missing_key(self, model_dict: dict[str, Any]) -> None:
         model_dict.pop("api_key")
 
         response = client.post(
@@ -130,7 +145,7 @@ class TestValidateOpenAI:
         }
         assert msg_dict == expected
 
-    def test_validate_incorrect_model(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_incorrect_model(self, model_dict: dict[str, Any]) -> None:
         model_dict["model"] = model_dict["model"] + "_turbo_diezel"
 
         response = client.post(
@@ -152,7 +167,7 @@ class TestValidateOpenAI:
         # print(f"{msg_dict=}")
         assert msg_dict == expected
 
-    def test_validate_incorrect_base_url(self, model_dict: Dict[str, Any]) -> None:
+    def test_validate_incorrect_base_url(self, model_dict: dict[str, Any]) -> None:
         model_dict["base_url"] = "mailto://api.openai.com/v1"
 
         response = client.post(

@@ -1,7 +1,8 @@
 import json
+from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Annotated, Any, Dict, Iterator, Optional
+from typing import Annotated, Any, Optional
 
 import fastapi
 import pytest
@@ -47,13 +48,13 @@ class TestClientEnd2End:
             q: Annotated[
                 Optional[str], Query(description="some extra query parameter")
             ] = None,
-        ) -> Dict[str, Any]:
+        ) -> dict[str, Any]:
             return {"item_id": item_id, "q": q}
 
         @app.post("/items/")
         async def create_item(
             item: Annotated[Item, Body(description="The item to create")],
-        ) -> Dict[str, Any]:
+        ) -> dict[str, Any]:
             item_id = 1
             return {"item_id": item_id, "item": item}
 
@@ -63,7 +64,7 @@ class TestClientEnd2End:
                 int, fastapi.Path(description="The ID of the item to update")
             ],
             item: Annotated[Item, Body(description="The item to update")],
-        ) -> Dict[str, Any]:
+        ) -> dict[str, Any]:
             return {"item_id": item_id, "item": item}
 
         @app.delete("/items/{item_id}", description="Delete an item by ID")
@@ -71,7 +72,7 @@ class TestClientEnd2End:
             item_id: Annotated[
                 int, fastapi.Path(description="The ID of the item to delete")
             ],
-        ) -> Dict[str, Any]:
+        ) -> dict[str, Any]:
             return {"item_id": item_id}
 
         return app
@@ -81,10 +82,10 @@ class TestClientEnd2End:
         assert isinstance(fastapi_app, FastAPI)
 
     @pytest.fixture
-    def openapi_schema(self, fastapi_app: FastAPI) -> Dict[str, Any]:
+    def openapi_schema(self, fastapi_app: FastAPI) -> dict[str, Any]:
         return fastapi_app.openapi()
 
-    def test_openapi_schema(self, openapi_schema: Dict[str, Any]) -> None:
+    def test_openapi_schema(self, openapi_schema: dict[str, Any]) -> None:
         expected = {
             "openapi": "3.1.0",
             "info": {
@@ -106,8 +107,8 @@ class TestClientEnd2End:
                 "/items/{item_id}": {
                     "get": {
                         "summary": "Read Item",
-                        "operationId": "read_item_items__item_id__get",
                         "description": "Read an item by ID",
+                        "operationId": "read_item_items__item_id__get",
                         "parameters": [
                             {
                                 "name": "item_id",
@@ -158,8 +159,8 @@ class TestClientEnd2End:
                     },
                     "put": {
                         "summary": "Update Item",
-                        "operationId": "update_item_items__item_id__put",
                         "description": "Update an item by ID",
+                        "operationId": "update_item_items__item_id__put",
                         "parameters": [
                             {
                                 "name": "item_id",
@@ -178,11 +179,8 @@ class TestClientEnd2End:
                             "content": {
                                 "application/json": {
                                     "schema": {
-                                        "allOf": [
-                                            {"$ref": "#/components/schemas/Item"}
-                                        ],
+                                        "$ref": "#/components/schemas/Item",
                                         "description": "The item to update",
-                                        "title": "Item",
                                     }
                                 }
                             },
@@ -213,8 +211,8 @@ class TestClientEnd2End:
                     },
                     "delete": {
                         "summary": "Delete Item",
-                        "operationId": "delete_item_items__item_id__delete",
                         "description": "Delete an item by ID",
+                        "operationId": "delete_item_items__item_id__delete",
                         "parameters": [
                             {
                                 "name": "item_id",
@@ -261,10 +259,7 @@ class TestClientEnd2End:
                             "content": {
                                 "application/json": {
                                     "schema": {
-                                        "allOf": [
-                                            {"$ref": "#/components/schemas/Item"}
-                                        ],
-                                        "title": "Item",
+                                        "$ref": "#/components/schemas/Item",
                                         "description": "The item to create",
                                     }
                                 }
@@ -353,10 +348,11 @@ class TestClientEnd2End:
                 }
             },
         }
+        # print(openapi_schema)
         assert openapi_schema == expected
 
     @pytest.fixture
-    def generated_code_path(self, openapi_schema: Dict[str, Any]) -> Iterator[Path]:
+    def generated_code_path(self, openapi_schema: dict[str, Any]) -> Iterator[Path]:
         with TemporaryDirectory() as temp_dir:
             td = Path(temp_dir)
             Client.generate_code(
@@ -377,11 +373,10 @@ from fastagency.openapi.client import Client
 
 from models_tmp61z6vu75 import (
     HTTPValidationError,
+    Item,
     ItemsItemIdDeleteResponse,
     ItemsItemIdGetResponse,
-    ItemsItemIdPutRequest,
     ItemsItemIdPutResponse,
-    ItemsPostRequest,
     ItemsPostResponse,
 )
 
@@ -402,7 +397,7 @@ app = Client(
     responses={'422': {'model': HTTPValidationError}},
 )
 def create_item_items__post(
-    body: ItemsPostRequest,
+    body: Item,
 ) -> Union[ItemsPostResponse, HTTPValidationError]:
     """
     Create Item
@@ -433,8 +428,7 @@ def read_item_items__item_id__get(
     responses={'422': {'model': HTTPValidationError}},
 )
 def update_item_items__item_id__put(
-    item_id: Annotated[int, """The ID of the item to update"""],
-    body: ItemsItemIdPutRequest = ...,
+    item_id: Annotated[int, """The ID of the item to update"""], body: Item = ...
 ) -> Union[ItemsItemIdPutResponse, HTTPValidationError]:
     """
     Update Item
@@ -456,17 +450,18 @@ def delete_item_items__item_id__delete(
     """
     pass
 '''
-        sufix = generated_code_path.name
-        expected = expected.replace("tmp61z6vu75", sufix)
+        suffix = generated_code_path.name
+        expected = expected.replace("tmp61z6vu75", suffix)
 
         assert generated_code_path.exists()
         assert generated_code_path.is_dir()
 
-        path = generated_code_path / f"main_{sufix}.py"
+        path = generated_code_path / f"main_{suffix}.py"
         assert path.exists()
 
         with path.open() as f:
             main = f.read()
+            # print(main)
             assert main == expected
 
     def test_generated_code_models(self, generated_code_path: Path) -> None:
@@ -499,19 +494,11 @@ class ItemsItemIdGetResponse(BaseModel):
     pass
 
 
-class ItemsItemIdPutRequest(Item):
-    pass
-
-
 class ItemsItemIdPutResponse(BaseModel):
     pass
 
 
 class ItemsItemIdDeleteResponse(BaseModel):
-    pass
-
-
-class ItemsPostRequest(Item):
     pass
 
 
@@ -524,17 +511,18 @@ class HTTPValidationError(BaseModel):
 """
         assert generated_code_path.exists()
         assert generated_code_path.is_dir()
-        sufix = generated_code_path.name
+        suffix = generated_code_path.name
 
-        path = generated_code_path / f"models_{sufix}.py"
+        path = generated_code_path / f"models_{suffix}.py"
         assert path.exists()
 
         with path.open() as f:
             models = f.read()
+            # print(models)
             assert models == expected
 
     @pytest.fixture
-    def client(self, openapi_schema: Dict[str, Any]) -> Client:
+    def client(self, openapi_schema: dict[str, Any]) -> Client:
         client = Client.create(json.dumps(openapi_schema))
         return client
 
@@ -557,7 +545,7 @@ class HTTPValidationError(BaseModel):
         assert func_desc == expected_func_desc
 
     def test_register_for_llm(
-        self, client: Client, azure_gpt35_turbo_16k_llm_config: Dict[str, Any]
+        self, client: Client, azure_gpt35_turbo_16k_llm_config: dict[str, Any]
     ) -> None:
         expected_tools = [
             {
@@ -589,7 +577,7 @@ class HTTPValidationError(BaseModel):
                                     },
                                 },
                                 "required": ["name", "price"],
-                                "title": "ItemsPostRequest",
+                                "title": "Item",
                                 "type": "object",
                                 "description": "body",
                             }
@@ -653,7 +641,7 @@ class HTTPValidationError(BaseModel):
                                     },
                                 },
                                 "required": ["name", "price"],
-                                "title": "ItemsItemIdPutRequest",
+                                "title": "Item",
                                 "type": "object",
                                 "default": Ellipsis,
                                 "description": "body",
@@ -687,11 +675,11 @@ class HTTPValidationError(BaseModel):
         )
         client.register_for_llm(agent)
         tools = agent.llm_config["tools"]
-
+        # print(tools)
         assert tools == expected_tools
 
     def test_register_for_execution(
-        self, client: Client, azure_gpt35_turbo_16k_llm_config: Dict[str, Any]
+        self, client: Client, azure_gpt35_turbo_16k_llm_config: dict[str, Any]
     ) -> None:
         expected_keys = {
             "create_item_items__post",

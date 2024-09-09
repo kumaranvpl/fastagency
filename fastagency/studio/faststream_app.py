@@ -1,7 +1,7 @@
 import json
 import random
 from os import environ
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from faststream import FastStream, Logger
 from faststream.nats import JStream, NatsBroker, NatsMessage
@@ -25,7 +25,7 @@ app = FastStream(broker)
 stream = JStream(name="ping_pong", subjects=["ping.*", "pong.*"])
 
 
-async def ping_handler(body: Dict[str, Any], msg: NatsMessage, logger: Logger) -> None:
+async def ping_handler(body: dict[str, Any], msg: NatsMessage, logger: Logger) -> None:
     raw_message = msg.raw_message
 
     subject = raw_message.subject
@@ -38,7 +38,7 @@ async def ping_handler(body: Dict[str, Any], msg: NatsMessage, logger: Logger) -
     )
 
     if "msg" not in body or body["msg"].lower() != "ping":
-        reply_msg = f"Unkown message: {body}, please send 'ping' in body['msg']"
+        reply_msg = f"Unknown message: {body}, please send 'ping' in body['msg']"
     else:
         reply_msg = "pong"
 
@@ -55,7 +55,7 @@ async def ping_handler(body: Dict[str, Any], msg: NatsMessage, logger: Logger) -
     queue="register_workers",
 )
 async def register_handler(
-    body: Dict[str, Any], msg: NatsMessage, logger: Logger
+    body: dict[str, Any], msg: NatsMessage, logger: Logger
 ) -> None:
     raw_message = msg.raw_message
 

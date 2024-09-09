@@ -1,4 +1,4 @@
-from typing import Annotated, Any, List, Optional, Tuple
+from typing import Annotated, Any, Optional
 from uuid import UUID
 
 from asyncer import syncify
@@ -100,7 +100,7 @@ class WebSurferAgent(AgentBaseModel):
     @classmethod
     async def create_autogen(
         cls, model_id: UUID, user_id: UUID, **kwargs: Any
-    ) -> Tuple[AutoGenAssistantAgent, List[WebSurferToolbox]]:
+    ) -> tuple[AutoGenAssistantAgent, list[WebSurferToolbox]]:
         from ...helpers import create_autogen, get_model_by_uuid
 
         websurfer_model: WebSurferAgent = await get_model_by_uuid(model_id)  # type: ignore [assignment]
@@ -130,7 +130,7 @@ class WebSurferAgent(AgentBaseModel):
         agent_name = websurfer_model.name
 
         system_message = (
-            "You are a helpful assistent with access to web surfing capabilities."
+            "You are a helpful assistant with access to web surfing capabilities."
             "Please use 'create_new_task' and 'continue_task_with_additional_instructions' functions to provide answers to other agents."
         )
 
